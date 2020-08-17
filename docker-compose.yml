@@ -15,3 +15,17 @@ services:
       KAFKA_JOLOKIA_PORT: 7777
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+  influxdb_v2:
+    image: quay.io/influxdb/influxdb:2.0.0-beta
+    volumes:
+      - $PWD:$PWD
+    working_dir: $PWD
+    ports:
+      - "9999:9999"
+  dependencies-all:
+    image: ubuntu:18.04
+    command: sleep infinity
+    depends_on:
+      - zookeeper
+      - kafka
+      - influxdb_v2
