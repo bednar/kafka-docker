@@ -8,8 +8,10 @@ services:
     build: .
     ports:
       - "9092"
+      - "7777:7777"
     environment:
       KAFKA_ADVERTISED_HOST_NAME: 192.168.99.100
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_JOLOKIA_PORT: 7777
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
