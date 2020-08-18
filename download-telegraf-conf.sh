@@ -23,25 +23,9 @@
 
 set -e
 
-echo "Install dependencies"
-apt-get -y install wget curl
+TELEGRAF_ID=$(influx telegrafs --org my-org --token my-token --hide-headers | grep kafka-zk-jolokia | awk -F' ' '{print $1}')
 
-echo "Wait to start InfluxDB 2.0"
-wget -S --spider --tries=20 --retry-connrefused --waitretry=5 http://influxdb_v2:9999/metrics
-
-echo
-echo "Post onBoarding request, to setup initial user (my-user@my-password), org (my-org) and bucketSetup (my-bucket)"
-echo
-curl -i -X POST http://influxdb_v2:9999/api/v2/setup -H 'accept: application/json' \
-    -d '{
-            "username": "my-user",
-            "password": "my-password",
-            "org": "my-org",
-            "bucket": "my-bucket",
-            "token": "my-token"
-        }'
-
-echo "Import Kafka Template"
-
-influx apply --file ./kafka-template.yml --org my-org --token my-token --force true
-
+curl --request GET \
+  --url http://localhost:9999/api/v2/telegrafs/"${TELEGRAF_ID}" \
+  --header 'Authorization: Token my-token' \
+  --output  kafka-zk-jolokia.conf

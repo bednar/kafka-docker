@@ -14,11 +14,14 @@ stop: composer-stop ## Stop all containers
 clear: composer-stop ## Clear all data: containers
 	$(RUN) docker-compose rm -f
 
-composer-start: ## Start composer
+composer-start: ## Start Docker composer
 	$(RUN) docker-compose up -d --build
 
-composer-stop: ## Stop composer
+composer-stop: ## Stop Docker composer
 	$(RUN) docker-compose stop
 
 influxdb-onboarding: ## OnBoarding, Install Kafka Template
 	$(RUN) docker-compose exec influxdb_v2 ./influxdb-onboarding.sh
+
+download-telegraf-conf: ## Download telegraf configuration
+	$(RUN) docker-compose exec influxdb_v2 ./download-telegraf-conf.sh
