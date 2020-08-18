@@ -23,9 +23,6 @@
 
 set -e
 
-echo "Create topics"
-kafka-topics.sh --create --topic push-data --partitions 4 --replication-factor 1 --zookeeper zookeeper:2181 || true 
-kafka-topics.sh --describe --topic push-data --zookeeper zookeeper:2181
-# kafka-producer-perf-test.sh --topic push-data --record-size 100 --throughput 50 --num-records 100 --producer-props bootstrap.servers=kafka:9092
-# kafka-console-consumer.sh --topic=push-data --bootstrap-server kafka:9092
+echo "Create consumer to consume push-data topic"
+kafka-console-consumer.sh --topic=push-data --bootstrap-server kafka:9092
 

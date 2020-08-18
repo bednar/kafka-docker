@@ -28,5 +28,11 @@ influxdb-onboarding: ## OnBoarding, Install Kafka Template
 kafka-onboarding: ## Create topics
 	$(RUN) docker-compose exec kafka ./kafka-onboarding.sh
 
+kafka-producer: ## Start perf producer
+	$(RUN) docker-compose exec kafka ./kafka-producer.sh
+
+kafka-consumer: ## Start consumer
+	$(RUN) docker-compose exec kafka ./kafka-consumer.sh
+
 telegraf-download-conf: ## Download telegraf configuration
 	$(RUN) docker-compose exec influxdb_v2 ./telegraf-download-conf.sh
