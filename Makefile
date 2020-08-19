@@ -25,6 +25,9 @@ composer-stop: ## Stop Docker composer
 influxdb-onboarding: ## OnBoarding, Install Kafka Template
 	$(RUN) docker-compose exec influxdb_v2 ./influxdb-onboarding.sh
 
+influxdb-export-template: ## Export template
+	$(RUN) docker-compose exec influxdb_v2 influx export all --org my-org --token my-token --file kafka-template.yml
+
 kafka-onboarding: ## Create topics
 	$(RUN) docker-compose exec kafka ./kafka-onboarding.sh
 
