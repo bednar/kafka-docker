@@ -35,7 +35,7 @@ services:
       INFLUX_ORG: my-org
       INFLUX_BUCKET: my-bucket
       JOLOKIA_AGENT_URL: http://kafka:7777/jolokia
-      ZOOKEEPER_CONNECTION_STRING: zookeeper:2181
+      ZOOKEEPER_HOST: zookeeper:2181
     depends_on:
       - influxdb_v2
     volumes:
