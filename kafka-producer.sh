@@ -25,5 +25,6 @@ set -e
 
 echo "Perf producer to push-data topic"
 
+export KAFKA_OPTS=-javaagent:/opt/kafka/libs/jolokia-jvm-1.6.0-agent.jar=port=5777,host=0.0.0.0
 kafka-producer-perf-test.sh --topic push-data --record-size 500 --throughput 50 --num-records 50000 --producer-props bootstrap.servers=kafka:9092
 

@@ -24,5 +24,7 @@
 set -e
 
 echo "Create consumer to consume push-data topic"
+
+export KAFKA_OPTS=-javaagent:/opt/kafka/libs/jolokia-jvm-1.6.0-agent.jar=port=6777,host=0.0.0.0
 kafka-console-consumer.sh --topic=push-data --bootstrap-server kafka:9092
 
