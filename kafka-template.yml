@@ -1,7 +1,7 @@
 apiVersion: influxdata.com/v2alpha1
 kind: Label
 metadata:
-    name: blissful-carson-2f2003
+    name: pensive-dewdney-d5e001
 spec:
     color: '#FFB94A'
     name: jvm
@@ -9,7 +9,7 @@ spec:
 apiVersion: influxdata.com/v2alpha1
 kind: Label
 metadata:
-    name: lucid-dhawan-2f2001
+    name: shiny-shirley-d5e003
 spec:
     color: '#8e1fc3'
     name: kafka
@@ -17,36 +17,32 @@ spec:
 apiVersion: influxdata.com/v2alpha1
 kind: Bucket
 metadata:
-    name: amazing-banach-2f2005
+    name: musing-leakey-d5e005
 spec:
     name: my-bucket
 ---
 apiVersion: influxdata.com/v2alpha1
 kind: Variable
 metadata:
-    name: confident-engelbart-2f2009
+    name: charming-agnesi-d5e00b
 spec:
-    associations:
-      - kind: Label
-        name: lucid-dhawan-2f2001
     language: flux
-    name: kafka_topic
+    name: bucket
     query: |-
-        import "influxdata/influxdb/v1"
-
-        all_data = buckets() |> limit(n:1) |> set(key: "_value", value: "*") |> keep(columns:["_value"])
-        brokers = v1.measurementTagValues(bucket: v.bucket, measurement: "kafka_topics", tag: "topic")
-        union(tables: [all_data, brokers]) |> sort()
+        buckets()
+          |> filter(fn: (r) => r.name !~ /^_/)
+          |> rename(columns: {name: "_value"})
+          |> keep(columns: ["_value"])
     type: query
 ---
 apiVersion: influxdata.com/v2alpha1
 kind: Variable
 metadata:
-    name: modest-kapitsa-6f2001
+    name: naughty-banach-d5e009
 spec:
     associations:
       - kind: Label
-        name: lucid-dhawan-2f2001
+        name: shiny-shirley-d5e003
     language: flux
     name: kafka_broker
     query: |-
@@ -61,25 +57,29 @@ spec:
 apiVersion: influxdata.com/v2alpha1
 kind: Variable
 metadata:
-    name: victorious-sanderson-6f2003
+    name: vivid-gauss-d5e00f
 spec:
+    associations:
+      - kind: Label
+        name: shiny-shirley-d5e003
     language: flux
-    name: bucket
+    name: kafka_topic
     query: |-
-        buckets()
-          |> filter(fn: (r) => r.name !~ /^_/)
-          |> rename(columns: {name: "_value"})
-          |> keep(columns: ["_value"])
+        import "influxdata/influxdb/v1"
+
+        all_data = buckets() |> limit(n:1) |> set(key: "_value", value: "*") |> keep(columns:["_value"])
+        brokers = v1.measurementTagValues(bucket: v.bucket, measurement: "kafka_topics", tag: "topic")
+        union(tables: [all_data, brokers]) |> sort()
     type: query
 ---
 apiVersion: influxdata.com/v2alpha1
 kind: Dashboard
 metadata:
-    name: beautiful-ishizaka-2f2001
+    name: compassionate-ramanujan-15e001
 spec:
     associations:
       - kind: Label
-        name: blissful-carson-2f2003
+        name: pensive-dewdney-d5e001
     charts:
       - colors:
           - hex: '#00C9FF'
@@ -738,11 +738,11 @@ spec:
 apiVersion: influxdata.com/v2alpha1
 kind: Dashboard
 metadata:
-    name: exciting-dhawan-ef2001
+    name: objective-ritchie-d5e001
 spec:
     associations:
       - kind: Label
-        name: lucid-dhawan-2f2001
+        name: shiny-shirley-d5e003
     charts:
       - colors:
           - hex: '#00C9FF'
@@ -758,7 +758,24 @@ spec:
                   |> range(start: v.timeRangeStart, stop: v.timeRangeStop)
                   |> filter(fn: (r) => r["_measurement"] == "kafka_controller")
                   |> filter(fn: (r) => r["_field"] == "ControllerState")
-        width: 2
+        width: 3
+      - colors:
+          - hex: '#00C9FF'
+            name: laser
+            type: text
+        decimalPlaces: 0
+        height: 1
+        kind: Single_Stat
+        name: LogEndOffset in v.kafka_topic
+        queries:
+          - query: |-
+                from(bucket: v.bucket)
+                  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)
+                  |> filter(fn: (r) => r["_measurement"] == "kafka_partition")
+                  |> filter(fn: (r) => r["_field"] == "LogEndOffset")
+                  |> filter(fn: (r) => r.topic == v.kafka_topic)
+        width: 3
+        yPos: 1
       - axes:
           - base: "10"
             name: x
@@ -795,7 +812,7 @@ spec:
         width: 6
         xCol: _time
         yCol: _value
-        yPos: 1
+        yPos: 2
       - axes:
           - base: "10"
             name: x
@@ -829,7 +846,7 @@ spec:
         width: 4
         xCol: _time
         yCol: _value
-        yPos: 4
+        yPos: 5
       - axes:
           - base: "10"
             name: x
@@ -857,7 +874,7 @@ spec:
         width: 3
         xCol: _time
         yCol: _value
-        yPos: 7
+        yPos: 8
       - axes:
           - base: "10"
             name: x
@@ -887,7 +904,7 @@ spec:
         width: 3
         xCol: _time
         yCol: _value
-        yPos: 10
+        yPos: 11
       - axes:
           - base: "10"
             name: x
@@ -920,7 +937,7 @@ spec:
         width: 6
         xCol: _time
         yCol: _value
-        yPos: 13
+        yPos: 14
       - colors:
           - hex: '#00C9FF'
             name: laser
@@ -939,8 +956,30 @@ spec:
                   |> last()
                   |> group()
                   |> sum()
-        width: 2
-        xPos: 2
+        width: 3
+        xPos: 3
+      - colors:
+          - hex: '#00C9FF'
+            name: laser
+            type: text
+        decimalPlaces: 0
+        height: 1
+        kind: Single_Stat
+        name: Number of in-sync replicas
+        queries:
+          - query: |-
+                import "experimental/aggregate"
+
+                from(bucket: v.bucket)
+                  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)
+                  |> filter(fn: (r) => r["_measurement"] == "kafka_replica_manager")
+                  |> filter(fn: (r) => r["_field"] == "IsrExpandsPerSec" or r["_field"] == "IsrShrinksPerSec")
+                  |> pivot(rowKey:["_time"], columnKey: ["_field"], valueColumn: "_value")
+                  |> map(fn: (r) => ({ r with _value: if r["IsrExpandsPerSec"] != 0 then (r["IsrShrinksPerSec"] / r["IsrExpandsPerSec"]) else float(v:0)}))
+                  |> aggregateWindow(every: v.windowPeriod, fn: max)
+        width: 3
+        xPos: 3
+        yPos: 1
       - axes:
           - base: "10"
             name: x
@@ -969,7 +1008,7 @@ spec:
         xCol: _time
         xPos: 3
         yCol: _value
-        yPos: 7
+        yPos: 8
       - axes:
           - base: "10"
             name: x
@@ -1000,26 +1039,7 @@ spec:
         xCol: _time
         xPos: 3
         yCol: _value
-        yPos: 10
-      - colors:
-          - hex: '#00C9FF'
-            name: laser
-            type: text
-        decimalPlaces: 0
-        height: 1
-        kind: Single_Stat
-        name: Underreplicated Partitions (total)
-        queries:
-          - query: |-
-                from(bucket: v.bucket)
-                  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)
-                  |> filter(fn: (r) => r["_measurement"] == "kafka_partition")
-                  |> filter(fn: (r) => r["_field"] == "UnderReplicatedPartitions")
-                  |> last()
-                  |> group()
-                  |> sum()
-        width: 2
-        xPos: 4
+        yPos: 11
       - axes:
           - base: "10"
             name: x
@@ -1059,7 +1079,7 @@ spec:
         xCol: _time
         xPos: 4
         yCol: _value
-        yPos: 4
+        yPos: 5
       - colors:
           - hex: '#00C9FF'
             name: laser
@@ -1067,17 +1087,37 @@ spec:
         decimalPlaces: 0
         height: 1
         kind: Single_Stat
-        name: Underreplicated Partitions in v.kafka_topic
+        name: Underreplicated Partitions (total)
         queries:
           - query: |-
                 from(bucket: v.bucket)
                   |> range(start: v.timeRangeStart, stop: v.timeRangeStop)
                   |> filter(fn: (r) => r["_measurement"] == "kafka_partition")
                   |> filter(fn: (r) => r["_field"] == "UnderReplicatedPartitions")
-                  |> filter(fn: (r) => r.topic == v.kafka_topic)
                   |> last()
-        width: 2
+                  |> group()
+                  |> sum()
+        width: 3
         xPos: 6
+      - colors:
+          - hex: '#00C9FF'
+            name: laser
+            type: text
+        decimalPlaces: 0
+        height: 1
+        kind: Single_Stat
+        name: Leader election rate
+        queries:
+          - query: |-
+                from(bucket: v.bucket)
+                  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)
+                  |> filter(fn: (r) => r["_measurement"] == "kafka_controller")
+                  |> filter(fn: (r) => r["name"] == "LeaderElectionRateAndTimeMs")
+                  |> aggregateWindow(every: v.windowPeriod, fn: max, createEmpty: false)
+                  |> yield(name: "mean")
+        width: 3
+        xPos: 6
+        yPos: 1
       - axes:
           - base: "10"
             name: x
@@ -1115,7 +1155,7 @@ spec:
         xCol: _time
         xPos: 6
         yCol: _value
-        yPos: 1
+        yPos: 2
       - axes:
           - base: "10"
             name: x
@@ -1149,7 +1189,7 @@ spec:
         xCol: _time
         xPos: 6
         yCol: _value
-        yPos: 7
+        yPos: 8
       - axes:
           - base: "10"
             name: x
@@ -1180,7 +1220,7 @@ spec:
         xCol: _time
         xPos: 6
         yCol: _value
-        yPos: 10
+        yPos: 11
       - axes:
           - base: "10"
             name: x
@@ -1214,24 +1254,7 @@ spec:
         xCol: _time
         xPos: 6
         yCol: _value
-        yPos: 13
-      - colors:
-          - hex: '#00C9FF'
-            name: laser
-            type: text
-        decimalPlaces: 0
-        height: 1
-        kind: Single_Stat
-        name: LogEndOffset in v.kafka_topic
-        queries:
-          - query: |-
-                from(bucket: v.bucket)
-                  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)
-                  |> filter(fn: (r) => r["_measurement"] == "kafka_partition")
-                  |> filter(fn: (r) => r["_field"] == "LogEndOffset")
-                  |> filter(fn: (r) => r.topic == v.kafka_topic)
-        width: 2
-        xPos: 8
+        yPos: 14
       - axes:
           - base: "10"
             name: x
@@ -1269,7 +1292,44 @@ spec:
         xCol: _time
         xPos: 8
         yCol: _value
-        yPos: 4
+        yPos: 5
+      - colors:
+          - hex: '#00C9FF'
+            name: laser
+            type: text
+        decimalPlaces: 0
+        height: 1
+        kind: Single_Stat
+        name: Underreplicated Partitions in v.kafka_topic
+        queries:
+          - query: |-
+                from(bucket: v.bucket)
+                  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)
+                  |> filter(fn: (r) => r["_measurement"] == "kafka_partition")
+                  |> filter(fn: (r) => r["_field"] == "UnderReplicatedPartitions")
+                  |> filter(fn: (r) => r.topic == v.kafka_topic)
+                  |> last()
+        width: 3
+        xPos: 9
+      - colors:
+          - hex: '#00C9FF'
+            name: laser
+            type: text
+        decimalPlaces: 0
+        height: 1
+        kind: Single_Stat
+        name: Unclean leader election rate
+        queries:
+          - query: |-
+                from(bucket: v.bucket)
+                  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)
+                  |> filter(fn: (r) => r["_measurement"] == "kafka_controller")
+                  |> filter(fn: (r) => r["name"] == "UncleanLeaderElectionsPerSec")
+                  |> aggregateWindow(every: v.windowPeriod, fn: max, createEmpty: false)
+                  |> yield(name: "mean")
+        width: 3
+        xPos: 9
+        yPos: 1
       - axes:
           - base: "10"
             name: x
@@ -1305,55 +1365,19 @@ spec:
         xCol: _time
         xPos: 9
         yCol: _value
-        yPos: 10
-      - colors:
-          - hex: '#00C9FF'
-            name: laser
-            type: text
-        decimalPlaces: 0
-        height: 1
-        kind: Single_Stat
-        name: Leader election rate
-        queries:
-          - query: |-
-                from(bucket: v.bucket)
-                  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)
-                  |> filter(fn: (r) => r["_measurement"] == "kafka_controller")
-                  |> filter(fn: (r) => r["name"] == "LeaderElectionRateAndTimeMs")
-                  |> aggregateWindow(every: v.windowPeriod, fn: max, createEmpty: false)
-                  |> yield(name: "mean")
-        width: 1
-        xPos: 10
-      - colors:
-          - hex: '#00C9FF'
-            name: laser
-            type: text
-        decimalPlaces: 0
-        height: 1
-        kind: Single_Stat
-        name: Unclean leader election rate
-        queries:
-          - query: |-
-                from(bucket: v.bucket)
-                  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)
-                  |> filter(fn: (r) => r["_measurement"] == "kafka_controller")
-                  |> filter(fn: (r) => r["name"] == "UncleanLeaderElectionsPerSec")
-                  |> aggregateWindow(every: v.windowPeriod, fn: max, createEmpty: false)
-                  |> yield(name: "mean")
-        width: 1
-        xPos: 11
+        yPos: 11
     name: Kafka Metrics
 ---
 apiVersion: influxdata.com/v2alpha1
 kind: Telegraf
 metadata:
-    name: amazing-keller-2f2005
+    name: infallible-cartwright-15e001
 spec:
     associations:
       - kind: Label
-        name: blissful-carson-2f2003
+        name: pensive-dewdney-d5e001
       - kind: Label
-        name: lucid-dhawan-2f2001
+        name: shiny-shirley-d5e003
     config: |
         [agent]
 
