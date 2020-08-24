@@ -1,7 +1,7 @@
 apiVersion: influxdata.com/v2alpha1
 kind: Label
 metadata:
-    name: gifted-tereshkova-8c2003
+    name: blissful-carson-2f2003
 spec:
     color: '#FFB94A'
     name: jvm
@@ -9,7 +9,7 @@ spec:
 apiVersion: influxdata.com/v2alpha1
 kind: Label
 metadata:
-    name: loving-jennings-8c2001
+    name: lucid-dhawan-2f2001
 spec:
     color: '#8e1fc3'
     name: kafka
@@ -17,18 +17,18 @@ spec:
 apiVersion: influxdata.com/v2alpha1
 kind: Bucket
 metadata:
-    name: vigilant-wozniak-cc2001
+    name: amazing-banach-2f2005
 spec:
     name: my-bucket
 ---
 apiVersion: influxdata.com/v2alpha1
 kind: Variable
 metadata:
-    name: exciting-visvesvaraya-cc2007
+    name: confident-engelbart-2f2009
 spec:
     associations:
       - kind: Label
-        name: loving-jennings-8c2001
+        name: lucid-dhawan-2f2001
     language: flux
     name: kafka_topic
     query: |-
@@ -42,11 +42,11 @@ spec:
 apiVersion: influxdata.com/v2alpha1
 kind: Variable
 metadata:
-    name: intelligent-hypatia-cc200b
+    name: modest-kapitsa-6f2001
 spec:
     associations:
       - kind: Label
-        name: loving-jennings-8c2001
+        name: lucid-dhawan-2f2001
     language: flux
     name: kafka_broker
     query: |-
@@ -61,7 +61,7 @@ spec:
 apiVersion: influxdata.com/v2alpha1
 kind: Variable
 metadata:
-    name: stubborn-satoshi-cc2003
+    name: victorious-sanderson-6f2003
 spec:
     language: flux
     name: bucket
@@ -75,11 +75,11 @@ spec:
 apiVersion: influxdata.com/v2alpha1
 kind: Dashboard
 metadata:
-    name: dazzling-mendel-8c2001
+    name: beautiful-ishizaka-2f2001
 spec:
     associations:
       - kind: Label
-        name: gifted-tereshkova-8c2003
+        name: blissful-carson-2f2003
     charts:
       - colors:
           - hex: '#00C9FF'
@@ -738,11 +738,11 @@ spec:
 apiVersion: influxdata.com/v2alpha1
 kind: Dashboard
 metadata:
-    name: righteous-bouman-cc2001
+    name: exciting-dhawan-ef2001
 spec:
     associations:
       - kind: Label
-        name: loving-jennings-8c2001
+        name: lucid-dhawan-2f2001
     charts:
       - colors:
           - hex: '#00C9FF'
@@ -1230,7 +1230,7 @@ spec:
                   |> filter(fn: (r) => r["_measurement"] == "kafka_partition")
                   |> filter(fn: (r) => r["_field"] == "LogEndOffset")
                   |> filter(fn: (r) => r.topic == v.kafka_topic)
-        width: 4
+        width: 2
         xPos: 8
       - axes:
           - base: "10"
@@ -1306,18 +1306,54 @@ spec:
         xPos: 9
         yCol: _value
         yPos: 10
+      - colors:
+          - hex: '#00C9FF'
+            name: laser
+            type: text
+        decimalPlaces: 0
+        height: 1
+        kind: Single_Stat
+        name: Leader election rate
+        queries:
+          - query: |-
+                from(bucket: v.bucket)
+                  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)
+                  |> filter(fn: (r) => r["_measurement"] == "kafka_controller")
+                  |> filter(fn: (r) => r["name"] == "LeaderElectionRateAndTimeMs")
+                  |> aggregateWindow(every: v.windowPeriod, fn: max, createEmpty: false)
+                  |> yield(name: "mean")
+        width: 1
+        xPos: 10
+      - colors:
+          - hex: '#00C9FF'
+            name: laser
+            type: text
+        decimalPlaces: 0
+        height: 1
+        kind: Single_Stat
+        name: Unclean leader election rate
+        queries:
+          - query: |-
+                from(bucket: v.bucket)
+                  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)
+                  |> filter(fn: (r) => r["_measurement"] == "kafka_controller")
+                  |> filter(fn: (r) => r["name"] == "UncleanLeaderElectionsPerSec")
+                  |> aggregateWindow(every: v.windowPeriod, fn: max, createEmpty: false)
+                  |> yield(name: "mean")
+        width: 1
+        xPos: 11
     name: Kafka Metrics
 ---
 apiVersion: influxdata.com/v2alpha1
 kind: Telegraf
 metadata:
-    name: inspiring-ptolemy-4c2001
+    name: amazing-keller-2f2005
 spec:
     associations:
       - kind: Label
-        name: gifted-tereshkova-8c2003
+        name: blissful-carson-2f2003
       - kind: Label
-        name: loving-jennings-8c2001
+        name: lucid-dhawan-2f2001
     config: |
         [agent]
 
@@ -1409,6 +1445,16 @@ spec:
           name         = "kafka_controller"
           mbean        = "kafka.controller:type=KafkaController,name=*"
           field_name   = "$1"
+        [[inputs.jolokia2_agent.metric]]
+          name         = "kafka_controller"
+          mbean        = "kafka.controller:type=ControllerStats,name=LeaderElectionRateAndTimeMs"
+          paths        = ["Count"]
+          tag_keys     = ["name"]
+        [[inputs.jolokia2_agent.metric]]
+          name         = "kafka_controller"
+          mbean        = "kafka.controller:type=ControllerStats,name=UncleanLeaderElectionsPerSec"
+          paths        = ["Count"]
+          tag_keys     = ["name"]
 
         [[inputs.jolokia2_agent.metric]]
           name         = "kafka_network"
@@ -1439,11 +1485,6 @@ spec:
           tag_keys     = ["request"]
           paths        = ["Count"]
           field_name   = "Count"
-
-        # [[inputs.jolokia2_agent.metric]]
-        #   name         = "kafka_controller"
-        #   mbean        = "kafka.controller:type=KafkaController,name=*"
-
 
         [[inputs.jolokia2_agent.metric]]
           name       = "kafka_partition"
